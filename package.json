@@ -1,0 +1,21 @@
+{
+  "name": "swagger-reader-mcp",
+  "version": "0.1.0",
+  "description": "Read-only live Swagger and OpenAPI search MCP server",
+  "type": "module",
+  "bin": {
+    "swagger-reader-mcp": "./bin/swagger-reader-mcp.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "license": "MIT"
+}
