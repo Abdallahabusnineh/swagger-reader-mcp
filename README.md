@@ -111,6 +111,30 @@ Cursor also accepts an explicit `type`:
 
 Restart Cursor after editing the file.
 
+## OpenCode
+
+Add the server to your OpenCode configuration under `mcp`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "swagger_reader": {
+      "type": "local",
+      "command": ["npx", "-y", "swagger-reader-mcp"],
+      "enabled": true,
+      "environment": {
+        "SWAGGER_URL": "https://api.example.com/openapi.json"
+      }
+    }
+  }
+}
+```
+
+OpenCode uses `environment` instead of `env`. For a protected Swagger
+document, add the same optional authentication values shown above inside
+`environment`.
+
 ## Codex
 
 Add the server from a terminal:
