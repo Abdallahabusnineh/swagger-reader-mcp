@@ -113,6 +113,33 @@ Load `.env.swagger` in your shell before starting Codex, or use a small
 project-local wrapper script that sources the ignored file before running
 `npx -y swagger-reader-mcp`.
 
+### Codex Project Wrapper
+
+Add `.env.swagger` to the consuming project's `.gitignore`, then create
+`tool/run-swagger-reader-mcp.sh`:
+
+```sh
+#!/bin/sh
+set -eu
+
+repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+
+set -a
+. "$repo_root/.env.swagger"
+set +a
+
+exec npx -y swagger-reader-mcp
+```
+
+Point the project's `.codex/config.toml` at the wrapper:
+
+```toml
+[mcp_servers.swagger_reader]
+command = "/bin/sh"
+args = ["tool/run-swagger-reader-mcp.sh"]
+enabled = true
+```
+
 ## Claude Code
 
 Load the environment variables in your shell, then run:
