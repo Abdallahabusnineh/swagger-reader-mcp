@@ -1,6 +1,6 @@
 {
   "name": "swagger-reader-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Read-only live Swagger and OpenAPI search MCP server",
   "type": "module",
   "bin": {

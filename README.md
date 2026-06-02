@@ -26,7 +26,6 @@ Never commit them.
 
 ```text
 SWAGGER_URL=https://api.example.com/openapi.json
-SWAGGER_API_KEY_LOCATION=none
 ```
 
 ### Query Parameter
@@ -67,23 +66,64 @@ SWAGGER_API_KEY=local-secret
 
 ## Add to a Project
 
-Create a local ignored environment file such as `.env.swagger`:
+Add one MCP server entry to your client configuration. For a public Swagger
+document, only `SWAGGER_URL` is required:
 
-```text
-SWAGGER_URL=https://api.example.com/openapi.json
-SWAGGER_API_KEY_LOCATION=none
+```json
+{
+  "mcpServers": {
+    "swagger_reader": {
+      "command": "npx",
+      "args": ["-y", "swagger-reader-mcp"],
+      "env": {
+        "SWAGGER_URL": "https://api.example.com/openapi.json"
+      }
+    }
+  }
+}
 ```
 
-Use one of the client-specific configurations below. Keep `.env.swagger`
-outside version control.
+If the Swagger document is protected, add only the authentication values that
+match the project. Query parameter example:
+
+```json
+{
+  "mcpServers": {
+    "swagger_reader": {
+      "command": "npx",
+      "args": ["-y", "swagger-reader-mcp"],
+      "env": {
+        "SWAGGER_URL": "https://api.example.com/docs-json",
+        "SWAGGER_API_KEY_LOCATION": "query",
+        "SWAGGER_API_KEY_NAME": "apiKey",
+        "SWAGGER_API_KEY": "project-secret"
+      }
+    }
+  }
+}
+```
+
+## Codex
+
+Codex uses TOML instead of JSON:
+
+```toml
+[mcp_servers.swagger_reader]
+command = "npx"
+args = ["-y", "swagger-reader-mcp"]
+enabled = true
+
+[mcp_servers.swagger_reader.env]
+SWAGGER_URL = "https://api.example.com/openapi.json"
+```
+
+`SWAGGER_API_KEY_LOCATION`, `SWAGGER_API_KEY_NAME`, and `SWAGGER_API_KEY` are
+optional. Do not commit secrets to a shared repository.
 
 ## Local Execution
 
 ```bash
-set -a
-source .env.swagger
-set +a
-node bin/swagger-reader-mcp.mjs
+SWAGGER_URL=https://api.example.com/openapi.json npx -y swagger-reader-mcp
 ```
 
 Run tests:
@@ -92,84 +132,14 @@ Run tests:
 npm test
 ```
 
-## Codex
-
-Forward shell environment variables to the package:
-
-```toml
-[mcp_servers.swagger_reader]
-command = "npx"
-args = ["-y", "swagger-reader-mcp"]
-env_vars = [
-  "SWAGGER_URL",
-  "SWAGGER_API_KEY_LOCATION",
-  "SWAGGER_API_KEY_NAME",
-  "SWAGGER_API_KEY",
-  "SWAGGER_CACHE_TTL_MS",
-]
-```
-
-Load `.env.swagger` in your shell before starting Codex, or use a small
-project-local wrapper script that sources the ignored file before running
-`npx -y swagger-reader-mcp`.
-
-### Codex Project Wrapper
-
-Add `.env.swagger` to the consuming project's `.gitignore`, then create
-`tool/run-swagger-reader-mcp.sh`:
-
-```sh
-#!/bin/sh
-set -eu
-
-repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-
-set -a
-. "$repo_root/.env.swagger"
-set +a
-
-exec npx -y swagger-reader-mcp
-```
-
-Point the project's `.codex/config.toml` at the wrapper:
-
-```toml
-[mcp_servers.swagger_reader]
-command = "/bin/sh"
-args = ["tool/run-swagger-reader-mcp.sh"]
-enabled = true
-```
-
 ## Claude Code
 
-Load the environment variables in your shell, then run:
+Pass the same environment values through your shell:
 
 ```bash
+SWAGGER_URL=https://api.example.com/openapi.json \
 claude mcp add --transport stdio --scope local swagger_reader -- \
   npx -y swagger-reader-mcp
-```
-
-Verify:
-
-```bash
-claude mcp list
-```
-
-## Cursor
-
-Create `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "swagger_reader": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "swagger-reader-mcp"],
-      "envFile": "${workspaceFolder}/.env.swagger"
-    }
-  }
-}
 ```
 
 ## Pre-Publish Verification
