@@ -39,6 +39,14 @@ That is all you need. Authentication settings are optional.
 If the Swagger document requires authentication, add only the values required
 by your project.
 
+Authentication can be sent in three common ways:
+
+- `query`: appends the key to the Swagger URL, for example `?apiKey=secret`.
+- `header`: sends the key as an HTTP header, for example `X-API-Key: secret`.
+- `bearer`: sends the key as an authorization token, for example `Authorization: Bearer secret`.
+
+If your Swagger document is public, you do not need any of these values.
+
 ### Query Parameter
 
 ```json
